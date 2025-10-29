@@ -16,19 +16,11 @@ class DatabaseSeeder extends Seeder
      */
 public function run(): void
 {
-    User::create([
-        'name' => 'Admin Genset',
-        'email' => 'admin@genset.test',
-        'password' => Hash::make('admin123'),
-        'role' => 'admin',
-    ]);
 
-    // contoh user biasa
-    User::create([
-        'name' => 'Budi',
-        'email' => 'budi@user.test',
-        'password' => Hash::make('user123'),
-        'role' => 'user',
+    $this->call([
+        UserSeeder::class,
+        CategorySeeder::class,
+        GensetSeeder::class,
     ]);
 }
 }

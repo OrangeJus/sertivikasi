@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Rental Genset') }}</title>
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <script src="{{ asset('js/multi-dropdown.js') }}"></script>
+
 </head>
 <body>
     @if(Auth::user()->role === 'admin')

@@ -24,7 +24,7 @@
             <span>Kelola User</span>
         </a>
 
-        <a href="#" class="nav-item">
+<a href="{{ route('admin.gensets.index') }}" class="nav-item {{ request()->routeIs('admin.gensets.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24">
                 <path d="M13 2L3 14h8l-2 8 10-12h-8l2-8z"/>
             </svg>

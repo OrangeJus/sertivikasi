@@ -764,3 +764,84 @@ body {
 .sidebar-overlay.show {
     display: block;
 }
+
+/* -------------------------------------------------------------- */
+/* Label */
+.multi-dropdown-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+.multi-dropdown-label .required {
+    color: #dc3545;
+}
+
+/* Dropdown utama */
+.dropdown-multi {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-selected {
+    width: 100%;
+    height: 44px;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    color: #333;
+}
+
+/* Dropdown opsi */
+.dropdown-options {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transition: opacity 0.2s ease;
+}
+
+/* Opsi item */
+.dropdown-option {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dropdown-option:hover {
+    background: #f7f7f7;
+}
+
+.dropdown-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* Badge +1 +2 +3 */
+.dropdown-text span {
+    background: #667eea;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}

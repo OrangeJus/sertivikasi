@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\GensetController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +31,7 @@ Route::fallback(function () {
 Route::middleware(['auth','role:admin'])->prefix('admin')->name('admin.')->group(function(){
     Route::get('/dashboard', [AdminController::class,'index'])->name('dashboard');
     Route::resource('users', UserManagementController::class);
+    Route::resource('gensets', GensetController::class);
     // tambahkan route admin lainnya di sini
 });
 

@@ -13,7 +13,7 @@
     <div class="card">
         <div class="card-header">
             <div>
-                <div class="card-value">156</div>
+                <div class="card-value">{{ $totalUsers }}</div>
                 <div class="card-label">Total User</div>
             </div>
             <div class="card-icon blue">
@@ -28,7 +28,7 @@
     <div class="card">
         <div class="card-header">
             <div>
-                <div class="card-value">24</div>
+                <div class="card-value">{{ $gensetTersedia }}</div>
                 <div class="card-label">Genset Tersedia</div>
             </div>
             <div class="card-icon green">
