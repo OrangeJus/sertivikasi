@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -11,12 +12,12 @@ class RentalController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Rental::with('genset','user');
+        $query = Rental::with('genset', 'user');
 
         if ($q = $request->input('q')) {
-            $query->whereHas('user', function($sub) use ($q) {
+            $query->whereHas('user', function ($sub) use ($q) {
                 $sub->where('name', 'like', "%{$q}%");
-            })->orWhereHas('genset', function($sub) use ($q) {
+            })->orWhereHas('genset', function ($sub) use ($q) {
                 $sub->where('nama_genset', 'like', "%{$q}%");
             });
         }
@@ -27,7 +28,7 @@ class RentalController extends Controller
 
     public function show(Rental $rental)
     {
-        $rental->load('user','genset');
+        $rental->load('user', 'genset');
         return view('admin.rentals.show', compact('rental'));
     }
 
@@ -35,23 +36,23 @@ class RentalController extends Controller
     {
         $request->validate(['status' => 'required|in:pending,active,selesai,batal']);
 
-        DB::transaction(function() use ($request, $rental) {
+        DB::transaction(function () use ($request, $rental) {
             $oldStatus = $rental->status;
             $newStatus = $request->status;
 
             // Calculate penalty if completing rental
             if ($newStatus === 'selesai' && $oldStatus === 'active') {
                 $rental->tanggal_pengembalian_aktual = now();
-                
+
                 // Check if overdue
                 if (now()->greaterThan($rental->tanggal_selesai)) {
                     $hariTerlambat = now()->diffInDays($rental->tanggal_selesai);
                     $dendaPerHari = $rental->genset->harga_sewa * 2; // 2x harga sewa
                     $totalDenda = $hariTerlambat * $dendaPerHari;
-                    
+
                     $rental->hari_keterlambatan = $hariTerlambat;
                     $rental->denda = $totalDenda;
-                    
+
                     // Update payment amount to include penalty
                     if ($rental->payment) {
                         $rental->payment->update([
@@ -71,7 +72,7 @@ class RentalController extends Controller
 
             if ($oldStatus !== 'active' && $newStatus === 'active') {
                 $genset->update(['status' => 'disewa']);
-            } elseif (in_array($newStatus, ['selesai','batal'])) {
+            } elseif (in_array($newStatus, ['selesai', 'batal'])) {
                 // Only set to tersedia if not reserved by other active rentals
                 $otherActive = Rental::where('genset_id', $genset->id)
                     ->where('id', '!=', $rental->id)

@@ -18,6 +18,23 @@
         </div>
     </div>
 
+    <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 12px; padding: 18px 22px; margin-bottom: 25px; border-left: 4px solid #2196f3;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <svg style="width: 24px; height: 24px; fill: #1565c0; flex-shrink: 0;" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <div>
+                <p style="color: #1565c0; font-size: 14px; margin: 0; font-weight: 500;">
+                    Anda sedang memiliki <strong>{{ $activeRentalsCount }}</strong> penyewaan aktif. 
+                    Batas maksimal adalah <strong>2 penyewaan aktif</strong>.
+                    @if($activeRentalsCount >= 1)
+                        Anda masih bisa menyewa <strong>{{ 2 - $activeRentalsCount }}</strong> genset lagi.
+                    @endif
+                </p>
+            </div>
+        </div>
+    </div>
+
     @if (session('success'))
         <div style="background: #d4edda; color: #155724; padding: 16px 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #28a745; display: flex; align-items: center; gap: 12px;">
             <svg style="width: 24px; height: 24px; fill: currentColor; flex-shrink: 0;" viewBox="0 0 24 24">
@@ -418,6 +435,7 @@
                     document.getElementById('duration').textContent = '0 hari';
                     document.getElementById('duration').style.color = '#333';
                     document.getElementById('totalPrice').textContent = 'Rp 0';
+                    document.getElementById('totalPrice').style.fontSize = '24px';
                     document.getElementById('totalPrice').style.color = '#667eea';
                     hideDurationWarning();
                     return;

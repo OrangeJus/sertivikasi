@@ -222,7 +222,14 @@
                             </p>
                         </div>
 
-                        @if($genset->status === 'tersedia')
+                        @php
+                            $canRent = $activeRentalsCount < 2;
+                            $alreadyRenting = Auth::user()->rentals()
+                                ->where('genset_id', $genset->id)
+                                ->whereIn('status', ['pending', 'active'])
+                                ->exists();
+                        @endphp
+                        @if($genset->status === 'tersedia' && $canRent && !$alreadyRenting)
                             <a href="{{ route('user.rentals.create', ['genset_id' => $genset->id]) }}" style="display: block; width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; transition: all 0.3s; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 6px 16px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.3)'">
                                 <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                     <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24">
@@ -231,6 +238,24 @@
                                     Sewa Sekarang
                                 </span>
                             </a>
+                        @elseif($alreadyRenting)
+                            <button disabled style="display: block; width: 100%; padding: 14px; background: #6c757d; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: not-allowed; text-align: center;">
+                                <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                    </svg>
+                                    Sudah Anda Sewa
+                                </span>
+                            </button>
+                        @elseif(!$canRent)
+                            <button disabled style="display: block; width: 100%; padding: 14px; background: #6c757d; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: not-allowed; text-align: center;">
+                                <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24">
+                                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                    </svg>
+                                    Batas Sewa Tercapai
+                                </span>
+                            </button>
                         @else
                             <button disabled style="display: block; width: 100%; padding: 14px; background: #dee2e6; color: #6c757d; border: none; border-radius: 10px; font-weight: 600; cursor: not-allowed; text-align: center;">
                                 Tidak Tersedia

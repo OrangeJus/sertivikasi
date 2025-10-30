@@ -426,34 +426,6 @@
                 </div>
             </div>
         </div>
-
-        <div style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 16px; padding: 24px; color: white; box-shadow: 0 8px 24px rgba(255, 193, 7, 0.3);">
-            <div style="display: flex; align-items: start; gap: 16px;">
-                <div style="width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <svg style="width: 26px; height: 26px; fill: white;" viewBox="0 0 24 24">
-                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Dukungan 24/7</h4>
-                    <p style="font-size: 13px; opacity: 0.95; line-height: 1.5; margin: 0;">Tim support kami siap membantu Anda kapan saja, 24 jam sehari 7 hari seminggu.</p>
-                </div>
-            </div>
-        </div>
-        <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 16px; padding: 24px; color: white; box-shadow: 0 8px 24px rgba(40, 167, 69, 0.3);">
-            <div style="display: flex; align-items: start; gap: 16px;">
-                <div style="width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <svg style="width: 26px; height: 26px; fill: white;" viewBox="0 0 24 24">
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Garansi Kualitas</h4>
-                    <p style="font-size: 13px; opacity: 0.95; line-height: 1.5; margin: 0;">Semua genset dijamin berkualitas dan akan diganti jika terjadi kerusakan selama masa sewa.</p>
-                </div>
-            </div>
-        </div>
-
         <div style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border-radius: 16px; padding: 24px; color: white; box-shadow: 0 8px 24px rgba(255, 193, 7, 0.3);">
             <div style="display: flex; align-items: start; gap: 16px;">
                 <div style="width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
