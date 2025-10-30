@@ -39,9 +39,31 @@ class RentalController extends Controller
             $oldStatus = $rental->status;
             $newStatus = $request->status;
 
+            // Calculate penalty if completing rental
+            if ($newStatus === 'selesai' && $oldStatus === 'active') {
+                $rental->tanggal_pengembalian_aktual = now();
+                
+                // Check if overdue
+                if (now()->greaterThan($rental->tanggal_selesai)) {
+                    $hariTerlambat = now()->diffInDays($rental->tanggal_selesai);
+                    $dendaPerHari = $rental->genset->harga_sewa * 2; // 2x harga sewa
+                    $totalDenda = $hariTerlambat * $dendaPerHari;
+                    
+                    $rental->hari_keterlambatan = $hariTerlambat;
+                    $rental->denda = $totalDenda;
+                    
+                    // Update payment amount to include penalty
+                    if ($rental->payment) {
+                        $rental->payment->update([
+                            'amount' => $rental->total_harga + $totalDenda
+                        ]);
+                    }
+                }
+            }
+
             $rental->update(['status' => $newStatus]);
 
-            // adjust genset status based on rental status transitions
+            // Adjust genset status based on rental status transitions
             $genset = Genset::find($rental->genset_id);
             if (!$genset) {
                 return;
@@ -50,7 +72,7 @@ class RentalController extends Controller
             if ($oldStatus !== 'active' && $newStatus === 'active') {
                 $genset->update(['status' => 'disewa']);
             } elseif (in_array($newStatus, ['selesai','batal'])) {
-                // only set to tersedia if not reserved by other active rentals
+                // Only set to tersedia if not reserved by other active rentals
                 $otherActive = Rental::where('genset_id', $genset->id)
                     ->where('id', '!=', $rental->id)
                     ->where('status', 'active')

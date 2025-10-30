@@ -100,6 +100,16 @@ class RentalController extends Controller
             'payment_proof.max' => 'Ukuran bukti pembayaran maksimal 2MB',
         ]);
 
+        $tanggal_mulai = Carbon::parse($request->tanggal_mulai);
+        $tanggal_selesai = Carbon::parse($request->tanggal_selesai);
+        $durasi = $tanggal_mulai->diffInDays($tanggal_selesai) + 1;
+
+        // VALIDASI: Maksimal 5 hari
+        if ($durasi > 5) {
+            return back()->with('error', 'Durasi penyewaan maksimal adalah 5 hari. Durasi yang Anda pilih: ' . $durasi . ' hari.')
+                ->withInput();
+        }
+
         $genset = Genset::findOrFail($request->genset_id);
 
         // Check if genset is available
@@ -120,9 +130,6 @@ class RentalController extends Controller
         }
 
         // Check if genset has overlapping rental period
-        $tanggal_mulai = Carbon::parse($request->tanggal_mulai);
-        $tanggal_selesai = Carbon::parse($request->tanggal_selesai);
-
         $overlappingRental = Rental::where('genset_id', $request->genset_id)
             ->whereIn('status', ['pending', 'active'])
             ->where(function($query) use ($tanggal_mulai, $tanggal_selesai) {
@@ -130,7 +137,7 @@ class RentalController extends Controller
                     ->orWhereBetween('tanggal_selesai', [$tanggal_mulai, $tanggal_selesai])
                     ->orWhere(function($q) use ($tanggal_mulai, $tanggal_selesai) {
                         $q->where('tanggal_mulai', '<=', $tanggal_mulai)
-                          ->where('tanggal_selesai', '>=', $tanggal_selesai);
+                        ->where('tanggal_selesai', '>=', $tanggal_selesai);
                     });
             })
             ->exists();
@@ -140,7 +147,6 @@ class RentalController extends Controller
                 ->withInput();
         }
 
-        $durasi = $tanggal_mulai->diffInDays($tanggal_selesai) + 1;
         $total_harga = $durasi * $genset->harga_sewa;
 
         try {
@@ -153,6 +159,8 @@ class RentalController extends Controller
                 'tanggal_mulai' => $request->tanggal_mulai,
                 'tanggal_selesai' => $request->tanggal_selesai,
                 'total_harga' => $total_harga,
+                'denda' => 0,
+                'hari_keterlambatan' => 0,
                 'status' => 'pending',
                 'catatan' => $request->catatan,
             ]);

@@ -277,6 +277,23 @@
                     </div>
                 </div>
 
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 12px; padding: 20px 24px; border-left: 4px solid #2196f3; margin-bottom: 24px;">
+                    <div style="display: flex; gap: 14px;">
+                        <svg style="width: 24px; height: 24px; fill: #1565c0; flex-shrink: 0;" viewBox="0 0 24 24">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                        <div>
+                            <strong style="color: #1565c0; display: block; margin-bottom: 8px; font-size: 15px;">Informasi Durasi & Denda:</strong>
+                            <ul style="color: #1565c0; font-size: 13px; line-height: 1.7; margin: 0; padding-left: 20px;">
+                                <li><strong>Maksimal durasi penyewaan: 5 hari</strong></li>
+                                <li>Keterlambatan pengembalian dikenakan denda <strong>2x harga sewa per hari</strong></li>
+                                <li>Contoh: Genset Rp 500.000/hari, terlambat 2 hari = denda Rp 2.000.000</li>
+                                <li>Pastikan mengembalikan genset tepat waktu untuk menghindari denda</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 12px;">
                     <button 
                         type="submit"
@@ -399,7 +416,10 @@
                 // Ensure end date is not before start date
                 if (end < start) {
                     document.getElementById('duration').textContent = '0 hari';
+                    document.getElementById('duration').style.color = '#333';
                     document.getElementById('totalPrice').textContent = 'Rp 0';
+                    document.getElementById('totalPrice').style.color = '#667eea';
+                    hideDurationWarning();
                     return;
                 }
 
@@ -407,10 +427,62 @@
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include the start day
                 
                 if (diffDays > 0) {
-                    const total = price * diffDays;
-                    document.getElementById('duration').textContent = diffDays + ' hari';
-                    document.getElementById('totalPrice').textContent = 'Rp ' + total.toLocaleString('id-ID');
+                    // VALIDASI: Maksimal 5 hari
+                    if (diffDays > 5) {
+                        document.getElementById('duration').textContent = diffDays + ' hari';
+                        document.getElementById('duration').style.color = '#dc3545';
+                        document.getElementById('totalPrice').textContent = 'Maks. 5 hari';
+                        document.getElementById('totalPrice').style.fontSize = '18px'; // Smaller font for warning
+                        document.getElementById('totalPrice').style.color = '#dc3545';
+                        
+                        // Show warning
+                        showDurationWarning();
+                    } else {
+                        const total = price * diffDays;
+                        document.getElementById('duration').textContent = diffDays + ' hari';
+                        document.getElementById('duration').style.color = '#333';
+                        document.getElementById('totalPrice').textContent = 'Rp ' + total.toLocaleString('id-ID');
+                        document.getElementById('totalPrice').style.fontSize = '24px'; // Reset font size
+                        document.getElementById('totalPrice').style.color = '#667eea';
+                        
+                        // Hide warning
+                        hideDurationWarning();
+                    }
                 }
+            }
+        }
+
+        function showDurationWarning() {
+            let warning = document.getElementById('durationWarning');
+            if (!warning) {
+                warning = document.createElement('div');
+                warning.id = 'durationWarning';
+                warning.style.cssText = 'margin-top: 16px; padding: 14px 18px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 10px; border-left: 4px solid #dc3545;';
+                warning.innerHTML = `
+                    <div style="display: flex; align-items: start; gap: 10px;">
+                        <svg style="width: 20px; height: 20px; fill: #721c24; flex-shrink: 0; margin-top: 2px;" viewBox="0 0 24 24">
+                            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                        </svg>
+                        <div>
+                            <strong style="color: #721c24; display: block; margin-bottom: 4px; font-size: 14px;">Durasi Melebihi Batas!</strong>
+                            <p style="color: #721c24; font-size: 13px; margin: 0; line-height: 1.5;">Maksimal durasi penyewaan adalah <strong>5 hari</strong>. Silakan pilih tanggal lain.</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Find the summary card (the sticky one) and append the warning
+                const summaryCard = document.querySelector('div[style*="position: sticky"] > .card');
+                if (summaryCard) {
+                    summaryCard.appendChild(warning);
+                }
+            }
+            warning.style.display = 'block';
+        }
+
+        function hideDurationWarning() {
+            const warning = document.getElementById('durationWarning');
+            if (warning) {
+                warning.style.display = 'none';
             }
         }
 
@@ -436,20 +508,17 @@
         // Payment method radio handler
         document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
             radio.addEventListener('change', function() {
-                // Remove active class from all cards
                 document.querySelectorAll('.payment-method-card').forEach(card => {
                     card.style.borderColor = '#e0e0e0';
                     card.style.background = 'white';
                     card.style.boxShadow = 'none';
                 });
                 
-                // Add active class to selected card
                 const card = this.parentElement.querySelector('.payment-method-card');
                 card.style.borderColor = '#667eea';
                 card.style.background = 'linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%)';
                 card.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.2)';
                 
-                // Show/hide bank account info
                 const bankInfo = document.getElementById('bankAccountInfo');
                 if (this.value === 'transfer') {
                     bankInfo.style.display = 'block';
@@ -493,6 +562,9 @@
             if (selectedPaymentMethod) {
                 selectedPaymentMethod.dispatchEvent(new Event('change'));
             }
+            
+            // Initial calculation in case dates are pre-filled (e.g., from old())
+            calculateTotal();
         });
     </script>
     <style>

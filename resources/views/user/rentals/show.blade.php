@@ -324,8 +324,81 @@
             </div>
 
         </div>
-
     </div>
+
+    @if($rental->denda > 0 || $rental->isOverdue())
+    <div class="card" style="margin-bottom: 30px;">
+        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: #333; display: flex; align-items: center; gap: 10px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0;">
+            <svg style="width: 26px; height: 26px; fill: #dc3545;" viewBox="0 0 24 24">
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+            </svg>
+            Informasi Denda Keterlambatan
+        </h3>
+        @if($rental->status === 'active' && $rental->isOverdue())
+            <div style="padding: 20px; background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 12px; border-left: 4px solid #dc3545; margin-bottom: 20px;">
+                <div style="display: flex; align-items: start; gap: 14px;">
+                    <svg style="width: 32px; height: 32px; fill: #721c24; flex-shrink: 0;" viewBox="0 0 24 24">
+                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                    </svg>
+                    <div style="flex: 1;">
+                        <h4 style="font-size: 16px; font-weight: 700; color: #721c24; margin-bottom: 8px;">⚠️ GENSET TERLAMBAT DIKEMBALIKAN!</h4>
+                        <p style="color: #721c24; font-size: 14px; margin-bottom: 12px; line-height: 1.6;">
+                            Penyewaan Anda sudah melewati batas waktu pengembalian. 
+                            Anda dikenakan denda <strong>2x harga sewa per hari keterlambatan</strong>.
+                        </p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px;">
+                            <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px;">
+                                <p style="color: #856404; font-size: 12px; margin-bottom: 4px;">Hari Terlambat</p>
+                                <p style="color: #721c24; font-size: 20px; font-weight: 800; margin: 0;">{{ $rental->hari_terlambat }} Hari</p>
+                            </div>
+                            <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px;">
+                                <p style="color: #856404; font-size: 12px; margin-bottom: 4px;">Denda per Hari</p>
+                                <p style="color: #721c24; font-size: 18px; font-weight: 800; margin: 0;">Rp {{ number_format($rental->genset->harga_sewa * 2, 0, ',', '.') }}</p>
+                            </div>
+                            <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px;">
+                                <p style="color: #856404; font-size: 12px; margin-bottom: 4px;">Total Denda Saat Ini</p>
+                                <p style="color: #dc3545; font-size: 22px; font-weight: 900; margin: 0;">Rp {{ number_format($rental->calculateDenda(), 0, ',', '.') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @elseif($rental->denda > 0)
+            <div style="padding: 20px; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 12px; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+                <div style="display: flex; align-items: start; gap: 14px;">
+                    <svg style="width: 28px; height: 28px; fill: #856404; flex-shrink: 0;" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    <div style="flex: 1;">
+                        <h4 style="font-size: 16px; font-weight: 700; color: #856404; margin-bottom: 8px;">Denda Keterlambatan Diterapkan</h4>
+                        <p style="color: #856404; font-size: 14px; margin-bottom: 12px;">
+                            Genset dikembalikan terlambat {{ $rental->hari_keterlambatan }} hari dari jadwal.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <div style="padding: 18px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; border-left: 4px solid #ffc107;">
+                    <p style="color: #999; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Hari Keterlambatan</p>
+                    <p style="color: #333; font-size: 24px; font-weight: 800; margin: 0;">{{ $rental->hari_keterlambatan }} Hari</p>
+                </div>
+                <div style="padding: 18px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; border-left: 4px solid #ffc107;">
+                    <p style="color: #999; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Denda per Hari</p>
+                    <p style="color: #333; font-size: 20px; font-weight: 800; margin: 0;">Rp {{ number_format($rental->genset->harga_sewa * 2, 0, ',', '.') }}</p>
+                </div>
+                <div style="padding: 18px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; border-left: 4px solid #dc3545;">
+                    <p style="color: #999; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Total Denda</p>
+                    <p style="color: #dc3545; font-size: 24px; font-weight: 900; margin: 0;">Rp {{ number_format($rental->denda, 0, ',', '.') }}</p>
+                </div>
+                <div style="padding: 18px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                    <p style="color: rgba(255,255,255,0.9); font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Total Pembayaran</p>
+                    <p style="color: white; font-size: 24px; font-weight: 900; margin: 0;">Rp {{ number_format($rental->total_pembayaran, 0, ',', '.') }}</p>
+                </div>
+            </div>
+        @endif
+    </div>
+    @endif
+
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
         <div style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); border-radius: 16px; padding: 24px; color: white; box-shadow: 0 8px 24px rgba(23, 162, 184, 0.3);">
             <div style="display: flex; align-items: start; gap: 16px;">
