@@ -8,6 +8,7 @@
             </button>
             <h1 class="page-title">@yield('page-title', 'Dashboard')</h1>
         @else
+        <a href="/" style="text-decoration: none; color: inherit;">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <div class="sidebar-logo" style="width: 45px; height: 45px;">
                     <svg viewBox="0 0 24 24">
@@ -16,6 +17,7 @@
                 </div>
                 <h1 class="page-title">Rental Genset</h1>
             </div>
+        </a>
         @endif
     </div>
 

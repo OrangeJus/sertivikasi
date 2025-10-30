@@ -21,6 +21,8 @@ public function run(): void
         UserSeeder::class,
         CategorySeeder::class,
         GensetSeeder::class,
+            RentalSeeder::class,
+            PaymentSeeder::class,
     ]);
 }
 }
