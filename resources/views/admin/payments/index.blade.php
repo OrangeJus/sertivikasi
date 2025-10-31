@@ -7,7 +7,7 @@
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
         <div>
             <h2 style="font-size: 28px; font-weight: 600; margin-bottom: 10px;">Kelola Pembayaran</h2>
-            <p style="color: #666; font-size: 14px;">Manajemen pembayaran penyewaan genset</p>
+            <p style="color: #666; font-size: 14px;">Manajemen pembayaran penyewaan genset & denda</p>
         </div>
     </div>
 </div>
@@ -19,11 +19,11 @@
     </div>
 @endif
 
-<!-- Search -->
+<!-- Search & Filter -->
 <div class="card" style="margin-bottom: 30px;">
     <form method="GET" action="{{ route('admin.payments.index') }}">
         <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 300px;">
+            <div style="flex: 1; min-width: 250px;">
                 <input 
                     type="text" 
                     name="q"
@@ -32,10 +32,17 @@
                     style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px;"
                 >
             </div>
+            <div style="min-width: 150px;">
+                <select name="payment_type" style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: white; cursor: pointer;">
+                    <option value="">Semua Tipe</option>
+                    <option value="rental" {{ request('payment_type') == 'rental' ? 'selected' : '' }}>Pembayaran Sewa</option>
+                    <option value="penalty" {{ request('payment_type') == 'penalty' ? 'selected' : '' }}>Pembayaran Denda</option>
+                </select>
+            </div>
             <button type="submit" style="padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
                 Cari
             </button>
-            @if(request('q'))
+            @if(request('q') || request('payment_type'))
                 <a href="{{ route('admin.payments.index') }}" style="padding: 12px 24px; background: #e0e0e0; color: #333; border-radius: 8px; text-decoration: none; font-weight: 600;">
                     Reset
                 </a>
@@ -77,12 +84,12 @@
     <div class="card">
         <div class="card-header">
             <div>
-                <div class="card-value">{{ $payments->where('payment_status', 'cancelled')->count() }}</div>
-                <div class="card-label">Dibatalkan</div>
+                <div class="card-value">Rp {{ number_format($payments->where('payment_type', 'rental')->where('payment_status', 'paid')->sum('amount'), 0, ',', '.') }}</div>
+                <div class="card-label">Total Sewa</div>
             </div>
-            <div class="card-icon orange">
+            <div class="card-icon blue">
                 <svg viewBox="0 0 24 24">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
                 </svg>
             </div>
         </div>
@@ -91,12 +98,12 @@
     <div class="card">
         <div class="card-header">
             <div>
-                <div class="card-value">Rp {{ number_format($payments->where('payment_status', 'paid')->sum('amount'), 0, ',', '.') }}</div>
-                <div class="card-label">Total Pendapatan</div>
+                <div class="card-value">Rp {{ number_format($payments->where('payment_type', 'penalty')->where('payment_status', 'paid')->sum('amount'), 0, ',', '.') }}</div>
+                <div class="card-label">Total Denda</div>
             </div>
-            <div class="card-icon blue">
+            <div class="card-icon orange">
                 <svg viewBox="0 0 24 24">
-                    <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
                 </svg>
             </div>
         </div>
@@ -110,6 +117,7 @@
             <thead>
                 <tr style="background: #f8f9fa; text-align: left;">
                     <th style="padding: 15px; font-weight: 600; color: #333; font-size: 14px;">No</th>
+                    <th style="padding: 15px; font-weight: 600; color: #333; font-size: 14px;">Tipe</th>
                     <th style="padding: 15px; font-weight: 600; color: #333; font-size: 14px;">User</th>
                     <th style="padding: 15px; font-weight: 600; color: #333; font-size: 14px;">Genset</th>
                     <th style="padding: 15px; font-weight: 600; color: #333; font-size: 14px;">Tanggal Bayar</th>
@@ -123,6 +131,13 @@
                 @forelse($payments as $index => $payment)
                 <tr style="border-bottom: 1px solid #e0e0e0;">
                     <td style="padding: 15px; color: #666; font-size: 14px;">{{ $payments->firstItem() + $index }}</td>
+                    <td style="padding: 15px;">
+                        @if($payment->payment_type === 'rental')
+                            <span style="background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: 600;">💳 Sewa</span>
+                        @else
+                            <span style="background: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: 600;">⚠️ Denda</span>
+                        @endif
+                    </td>
                     <td style="padding: 15px;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">
@@ -180,36 +195,33 @@
                             </a>
 
                             @if($payment->payment_status === 'pending')
-                                <form method="POST" action="{{ route('admin.payments.update', $payment->id) }}" style="display: inline-block;">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="payment_status" value="paid">
-                                    <button type="submit" onclick="return confirm('Konfirmasi pembayaran ini sebagai LUNAS?')" style="padding: 8px 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+                                @if($payment->payment_type === 'penalty')
+                                    <a href="{{ route('admin.rentals.show', $payment->rental_id) }}" style="padding: 8px 12px; background: #ffc107; color: white; border-radius: 5px; text-decoration: none; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
                                         <svg style="width: 16px; height: 16px; fill: white;" viewBox="0 0 24 24">
                                             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                                         </svg>
-                                        Konfirmasi
-                                    </button>
-                                </form>
-
-                                <form method="POST" action="{{ route('admin.payments.update', $payment->id) }}" style="display: inline-block;">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input type="hidden" name="payment_status" value="cancelled">
-                                    <button type="submit" onclick="return confirm('Batalkan pembayaran ini?')" style="padding: 8px 12px; background: #dc3545; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
-                                        <svg style="width: 16px; height: 16px; fill: white;" viewBox="0 0 24 24">
-                                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                                        </svg>
-                                        Batalkan
-                                    </button>
-                                </form>
+                                        Verifikasi
+                                    </a>
+                                @else
+                                    <form method="POST" action="{{ route('admin.payments.update', $payment->id) }}" style="display: inline-block;">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="payment_status" value="paid">
+                                        <button type="submit" onclick="return confirm('Konfirmasi pembayaran ini sebagai LUNAS?')" style="padding: 8px 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+                                            <svg style="width: 16px; height: 16px; fill: white;" viewBox="0 0 24 24">
+                                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                            </svg>
+                                            Konfirmasi
+                                        </button>
+                                    </form>
+                                @endif
                             @endif
                         </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" style="padding: 40px; text-align: center; color: #999;">
+                    <td colspan="9" style="padding: 40px; text-align: center; color: #999;">
                         <svg style="width: 64px; height: 64px; fill: #ddd; margin-bottom: 15px;" viewBox="0 0 24 24">
                             <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
                         </svg>

@@ -87,6 +87,155 @@
         @endif
     </div>
 
+    @if($rental->status === 'active')
+        <div style="margin-bottom: 30px;">
+            @if($rental->status_pengembalian === 'diminta')
+                <div style="background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); border-radius: 16px; padding: 24px 30px; border-left: 6px solid #17a2b8; box-shadow: 0 4px 12px rgba(23, 162, 184, 0.2);">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 56px; height: 56px; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 32px; height: 32px; fill: #0c5460;" viewBox="0 0 24 24">
+                                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 18px; font-weight: 700; color: #0c5460; margin-bottom: 6px;">⏳ Menunggu Persetujuan Pengembalian</h3>
+                            <p style="color: #0c5460; font-size: 14px; margin: 0; opacity: 0.9;">
+                                Request pengembalian Anda sedang ditinjau oleh admin. Kami akan menghubungi Anda segera.
+                            </p>
+                            <p style="color: #0c5460; font-size: 13px; margin-top: 8px; margin-bottom: 0;">
+                                <strong>Diajukan pada:</strong> {{ $rental->tanggal_request_pengembalian->format('d M Y, H:i') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @elseif($rental->isOverdue() && !$rental->isPenaltyPaidAndVerified())
+                <div style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 16px; padding: 24px 30px; border-left: 6px solid #dc3545; box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);">
+                    <div style="display: flex; align-items: start; gap: 16px;">
+                        <div style="width: 56px; height: 56px; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 32px; height: 32px; fill: #721c24;" viewBox="0 0 24 24">
+                                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                            </svg>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 18px; font-weight: 700; color: #721c24; margin-bottom: 8px;">⚠️ GENSET TERLAMBAT DIKEMBALIKAN!</h3>
+                            <p style="color: #721c24; font-size: 14px; margin-bottom: 12px; line-height: 1.6;">
+                            Penyewaan Anda sudah melewati batas waktu pengembalian. 
+                            Anda dikenakan denda <strong>2x harga sewa per hari keterlambatan.</strong>
+                            <br>Anda terlambat <strong>{{ $overdueDays }} hari</strong> mengembalikan genset. 
+                            Silakan bayar denda terlebih dahulu sebelum mengajukan request pengembalian.
+                            </p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px;">
+                                    <p style="color: #856404; font-size: 12px; margin-bottom: 4px;">Hari Terlambat</p>
+                                    <p style="color: #721c24; font-size: 20px; font-weight: 800; margin: 0;">{{ $overdueDays }} Hari</p>
+                                </div>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px;">
+                                    <p style="color: #856404; font-size: 12px; margin-bottom: 4px;">Denda per Hari</p>
+                                    <p style="color: #721c24; font-size: 18px; font-weight: 800; margin: 0;">Rp {{ number_format($rental->genset->harga_sewa * 2, 0, ',', '.') }}</p>
+                                </div>
+                                <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px;">
+                                    <p style="color: #856404; font-size: 12px; margin-bottom: 4px;">Total Denda</p>
+                                    <p style="color: #dc3545; font-size: 20px; font-weight: 900; margin: 0;">Rp {{ number_format($currentPenalty, 0, ',', '.') }}</p>
+                                </div>
+                            </div>
+                            @if($rental->hasPendingPenaltyPayment())
+                                <div style="padding: 14px 18px; background: rgba(255, 243, 205, 0.8); border-radius: 8px; margin-bottom: 12px;">
+                                    <p style="color: #856404; font-size: 13px; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                        <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24">
+                                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                                        </svg>
+                                        <strong>Bukti pembayaran sedang diverifikasi admin.</strong> Anda akan dihubungi segera.
+                                    </p>
+                                </div>
+                                <form method="POST" action="{{ route('user.rentals.cancel-penalty', $rental->id) }}" style="display: inline-block;" onsubmit="return confirm('Yakin ingin membatalkan upload bukti pembayaran?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" style="padding: 12px 24px; background: #6c757d; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;" onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'">
+                                        <svg style="width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24">
+                                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                        </svg>
+                                        Batalkan Upload
+                                    </button>
+                                </form>
+                            @else
+                                <a href="{{ route('user.rentals.show-upload-penalty', $rental->id) }}" style="padding: 14px 28px; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(220, 53, 69, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(220, 53, 69, 0.3)'">
+                                    Bayar Denda Sekarang
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @elseif($rental->isOverdue() && $rental->isPenaltyPaidAndVerified())
+                <div style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 16px; padding: 24px 30px; border-left: 6px solid #28a745; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 56px; height: 56px; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 32px; height: 32px; fill: #155724;" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 18px; font-weight: 700; color: #155724; margin-bottom: 6px;">✓ Pembayaran Denda Terverifikasi</h3>
+                            <p style="color: #155724; font-size: 14px; margin-bottom: 12px; opacity: 0.9;">
+                                Pembayaran denda Anda telah diverifikasi. Sekarang Anda dapat mengajukan request pengembalian genset.
+                            </p>
+                            <a href="{{ route('user.rentals.request-return', $rental->id) }}" style="padding: 12px 24px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(40, 167, 69, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(40, 167, 69, 0.3)'">
+                                <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                </svg>
+                                Request Pengembalian
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-radius: 16px; padding: 24px 30px; border-left: 6px solid #28a745; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 56px; height: 56px; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 32px; height: 32px; fill: #155724;" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 18px; font-weight: 700; color: #155724; margin-bottom: 6px;">Sudah Selesai Menggunakan Genset?</h3>
+                            <p style="color: #155724; font-size: 14px; margin-bottom: 12px; opacity: 0.9;">
+                                Jika Anda sudah selesai menggunakan genset, silakan ajukan request pengembalian untuk proses selanjutnya.
+                            </p>
+                            <a href="{{ route('user.rentals.request-return', $rental->id) }}" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.3)'">
+                                <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                </svg>
+                                Request Pengembalian
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @elseif($rental->status_pengembalian === 'ditolak')
+        <div style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); border-radius: 16px; padding: 24px 30px; margin-bottom: 30px; border-left: 6px solid #dc3545; box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);">
+            <div style="display: flex; align-items: start; gap: 16px;">
+                <div style="width: 56px; height: 56px; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg style="width: 32px; height: 32px; fill: #721c24;" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </div>
+                <div style="flex: 1;">
+                    <h3 style="font-size: 18px; font-weight: 700; color: #721c24; margin-bottom: 6px;">Request Pengembalian Ditolak</h3>
+                    <p style="color: #721c24; font-size: 14px; margin-bottom: 8px; opacity: 0.9;">
+                        Request pengembalian Anda ditolak oleh admin. Silakan hubungi admin untuk informasi lebih lanjut.
+                    </p>
+                    @if($rental->catatan_pengembalian_admin)
+                        <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px; margin-top: 12px;">
+                            <p style="color: #721c24; font-size: 13px; margin: 0;">
+                                <strong>Alasan:</strong> {{ $rental->catatan_pengembalian_admin }}
+                            </p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div style="display: grid; grid-template-columns: 1fr 380px; gap: 30px; margin-bottom: 30px;">
         
         <div style="display: flex; flex-direction: column; gap: 30px;">
@@ -349,7 +498,7 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px;">
                             <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px;">
                                 <p style="color: #856404; font-size: 12px; margin-bottom: 4px;">Hari Terlambat</p>
-                                <p style="color: #721c24; font-size: 20px; font-weight: 800; margin: 0;">{{ $rental->hari_terlambat }} Hari</p>
+                                <p style="color: #721c24; font-size: 20px; font-weight: 800; margin: 0;">{{ $overdueDays }} Hari</p>
                             </div>
                             <div style="padding: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 8px;">
                                 <p style="color: #856404; font-size: 12px; margin-bottom: 4px;">Denda per Hari</p>
@@ -372,7 +521,7 @@
                     <div style="flex: 1;">
                         <h4 style="font-size: 16px; font-weight: 700; color: #856404; margin-bottom: 8px;">Denda Keterlambatan Diterapkan</h4>
                         <p style="color: #856404; font-size: 14px; margin-bottom: 12px;">
-                            Genset dikembalikan terlambat {{ $rental->hari_keterlambatan }} hari dari jadwal.
+                            Genset dikembalikan terlambat {{ $overdueDays }} hari dari jadwal.
                         </p>
                     </div>
                 </div>
@@ -380,7 +529,7 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
                 <div style="padding: 18px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; border-left: 4px solid #ffc107;">
                     <p style="color: #999; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Hari Keterlambatan</p>
-                    <p style="color: #333; font-size: 24px; font-weight: 800; margin: 0;">{{ $rental->hari_keterlambatan }} Hari</p>
+                    <p style="color: #333; font-size: 24px; font-weight: 800; margin: 0;">{{ $overdueDays }} Hari</p>
                 </div>
                 <div style="padding: 18px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 12px; border-left: 4px solid #ffc107;">
                     <p style="color: #999; font-size: 12px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Denda per Hari</p>

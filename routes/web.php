@@ -35,23 +35,53 @@ Route::fallback(function () {
 });
 
 
-Route::middleware(['auth','role:admin'])->prefix('admin')->name('admin.')->group(function(){
-    Route::get('/dashboard', [AdminController::class,'index'])->name('dashboard');
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
     Route::resource('users', UserManagementController::class);
     Route::resource('gensets', GensetController::class);
     Route::resource('categories', CategoryController::class);
-    Route::resource('rentals', AdminRentalController::class)->only(['index','show','update']);
-    Route::resource('payments', AdminPaymentController::class)->only(['index','show','update']);
-        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // Rentals
+    Route::get('/rentals', [AdminRentalController::class, 'index'])->name('rentals.index');
+    Route::get('/rentals/{rental}', [AdminRentalController::class, 'show'])->name('rentals.show');
+    Route::patch('/rentals/{rental}', [AdminRentalController::class, 'update'])->name('rentals.update');
+
+    // Penalty & Return Verification
+    Route::post('/rentals/{rental}/verify-penalty', [AdminRentalController::class, 'verifyPenaltyPayment'])->name('rentals.verify-penalty');
+    Route::post('/rentals/{rental}/approve-return', [AdminRentalController::class, 'approveReturnRequest'])->name('rentals.approve-return');
+
+    // Payments
+    Route::resource('payments', AdminPaymentController::class)->only(['index', 'show', 'update']);
+    
+    // Reports
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('reports/rentals', [ReportController::class, 'rentals'])->name('reports.rentals'); // ajax / table
     Route::get('reports/exports', [ReportController::class, 'export'])->name('reports.export'); // ?type=csv/pdf
+    
     // tambahkan route admin lainnya di sini
 });
 
-Route::middleware(['auth','role:user'])->prefix('user')->name('user.')->group(function(){
-    Route::get('/dashboard', [UserController::class,'index'])->name('dashboard');
-    Route::resource('rentals', UserRentalController::class)->only(['index','create','store','show']);
-    Route::resource('payments', UserPaymentController::class)->only(['index','create','store','show']);
+Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(function () {
+    Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
+
+    // Rentals
+    Route::get('/rentals', [UserRentalController::class, 'index'])->name('rentals.index');
+    Route::get('/rentals/create', [UserRentalController::class, 'create'])->name('rentals.create');
+    Route::post('/rentals', [UserRentalController::class, 'store'])->name('rentals.store');
+    Route::get('/rentals/{rental}', [UserRentalController::class, 'show'])->name('rentals.show');
+
+    // Return Request
+    Route::get('/rentals/{rental}/request-return', [UserRentalController::class, 'requestReturn'])->name('rentals.request-return');
+    Route::post('/rentals/{rental}/request-return', [UserRentalController::class, 'storeReturnRequest'])->name('rentals.store-return');
+
+    // Penalty Payment
+    Route::get('/rentals/{rental}/upload-penalty', [UserRentalController::class, 'showUploadPenalty'])->name('rentals.show-upload-penalty');
+    Route::post('/rentals/{rental}/upload-penalty', [UserRentalController::class, 'uploadPenaltyProof'])->name('rentals.upload-penalty');
+    Route::delete('/rentals/{rental}/cancel-penalty', [UserRentalController::class, 'cancelPenaltyPayment'])->name('rentals.cancel-penalty');
+    
+    // Payments
+    Route::resource('payments', UserPaymentController::class)->only(['index', 'create', 'store', 'show']);
+    
     // route user lainnya
 });
 
@@ -64,4 +94,4 @@ Route::middleware('auth')->group(function () {
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
